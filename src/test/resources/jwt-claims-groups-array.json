@@ -1,0 +1,13 @@
+{
+  "scope": [
+    "openid"
+  ],
+  "client_id": "ordbar",
+  "iss": "test-issuer",
+  "sub": "myuser",
+  "upn": "myuser",
+  "groups": [
+    "WEBAPP_GROUP"
+  ],
+  "exp": 1
+}
