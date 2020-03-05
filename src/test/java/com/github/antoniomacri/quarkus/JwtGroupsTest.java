@@ -6,12 +6,14 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.Cookie;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import io.smallrye.jwt.build.Jwt;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.jwt.Claims;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -56,11 +58,21 @@ class JwtGroupsTest {
     }
 
     private Cookie generateJsonWebTokenCookie(String claimFile) {
-        String token = Jwt.claims(claimFile).expiresAt(System.currentTimeMillis() / 1000 + 3600).sign();
+        String token = generateJsonWebToken(claimFile);
         return new Cookie.Builder(cookieName, token)
                 .setPath("/")
                 .setMaxAge(3600)
                 .build();
+    }
+
+    private String generateJsonWebToken(String claimFile) {
+        try {
+            Map<String, Object> timeClaims = new HashMap<>();
+            timeClaims.put(Claims.exp.name(), TokenUtils.currentTimeInSecs() + (long) 3600);
+            return TokenUtils.generateTokenString(claimFile, timeClaims);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private ResponseSpecification resourceAccessed() {
